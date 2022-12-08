@@ -130,7 +130,7 @@ PrintCenter(
 	{
 		// There is no solution for printing indentation with SPrint, so we SetMem with
 		// spaces our temp buffer and write our string!
-		SetMem16(Buffer, CMD_LINE_LINES*2, ' ');
+		SetMem16(Buffer, CMD_LINE_LINES*2, (CHAR16)' ');
 		centerHalfWidth = (INT32)(CMD_LINE_LINES - wcslen(strArray[t])) / 2;
 		CopyMem(Buffer + centerHalfWidth, strArray[t], wcslen(strArray[t]) * sizeof(CHAR16));
 		Print(Buffer);
