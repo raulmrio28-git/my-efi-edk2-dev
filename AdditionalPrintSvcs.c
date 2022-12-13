@@ -87,8 +87,8 @@ CHAR16
 ** ===========================================================================
 */
 
-CHAR16**
-UnicodeSplit(
+CHAR16
+**UnicodeSplit(
 	IN CONST CHAR16 *pszInChar,
 	IN INTN nChars,
 	OUT INTN *nStrCnt,
@@ -171,7 +171,7 @@ PrintAlign(
 	CHAR16  pszBuffer[CMD_LINE_LINES + 1];
 	INT32	nNoOfSpaces;
 	CHAR16  pszInTmp[EFI_DRIVER_LIB_MAX_PRINT_BUFFER];
-	CHAR16** pstrArray = NULL;
+	CHAR16** pStrArray = NULL;
 	INTN	nStrCnt = 0;
 	INT32	nTempCnt;
 	pszBuffer[CMD_LINE_LINES] = 0;
@@ -181,22 +181,22 @@ PrintAlign(
 	VA_START(vMarker, nAlignment);
 	nReturn = UnicodeVSPrint(pszInTmp, sizeof(pszInTmp), pszInChar, vMarker);
 	VA_END(vMarker);
-	pstrArray = UnicodeSplit(pszInTmp, CMD_LINE_LINES, &nStrCnt, pstrArray);
+	pStrArray = UnicodeSplit(pszInTmp, CMD_LINE_LINES, &nStrCnt, pStrArray);
 	for (nTempCnt = 0; nTempCnt < nStrCnt; nTempCnt++)
 	{
 		// There is no solution for printing indentation with SPrint, so we SetMem with
 		// spaces our temp buffer and write our string!
 		SetMem16(pszBuffer, CMD_LINE_LINES * 2, (CHAR16)' ');
-		nNoOfSpaces = (INT32)(CMD_LINE_LINES - wcslen(pstrArray[nTempCnt]));
+		nNoOfSpaces = (INT32)(CMD_LINE_LINES - wcslen(pStrArray[nTempCnt]));
 		if (nAlignment == PR_CENTER)
 			nNoOfSpaces /= 2;
 		if (nAlignment != PR_LEFT)
-			CopyMem(pszBuffer + nNoOfSpaces, pstrArray[nTempCnt], wcslen(pstrArray[nTempCnt]) * sizeof(CHAR16));
+			CopyMem(pszBuffer + nNoOfSpaces, pStrArray[nTempCnt], wcslen(pStrArray[nTempCnt]) * sizeof(CHAR16));
 		else
-			CopyMem(pszBuffer, pstrArray[nTempCnt], wcslen(pstrArray[nTempCnt]) * sizeof(CHAR16));
-		Print(pszBuffer);
+			CopyMem(pszBuffer, pStrArray[nTempCnt], wcslen(pStrArray[nTempCnt]) * sizeof(CHAR16));
+		nReturn = Print(pszBuffer);
 	}
-	FreePool(pstrArray);
+	FreePool(pStrArray);
 	return nReturn;
 }
 
@@ -226,7 +226,7 @@ PrintBorder(
 	CHAR16  pszBuffer[CMD_LINE_LINES + 1];
 	INT32	nNoOfSpaces;
 	CHAR16  szInTmp[EFI_DRIVER_LIB_MAX_PRINT_BUFFER];
-	CHAR16** pstrArray = NULL;
+	CHAR16** pStrArray = NULL;
 	INTN	nStrCnt = 0;
 	INT32	nTempCnt;
 	pszBuffer[CMD_LINE_LINES] = 0;
@@ -236,25 +236,25 @@ PrintBorder(
 	VA_START(vMarker, nAlignment);
 	nReturn = UnicodeVSPrint(szInTmp, sizeof(szInTmp), pszInChar, vMarker);
 	VA_END(vMarker);
-	pstrArray = UnicodeSplit(szInTmp, CMD_LINE_LINES - 4, &nStrCnt, pstrArray);
+	pStrArray = UnicodeSplit(szInTmp, CMD_LINE_LINES - 4, &nStrCnt, pStrArray);
 	PrintHBorder(CMD_LINE_LINES);
 	for (nTempCnt = 0; nTempCnt < nStrCnt; nTempCnt++)
 	{
 		// There is no solution for printing indentation with SPrint, so we SetMem with
 		// spaces our temp buffer and write our string!
 		SetMem16(pszBuffer, CMD_LINE_LINES * 2, (CHAR16)' ');
-		nNoOfSpaces = (INT32)(CMD_LINE_LINES - 4 - wcslen(pstrArray[nTempCnt]));
+		nNoOfSpaces = (INT32)(CMD_LINE_LINES - 4 - wcslen(pStrArray[nTempCnt]));
 		pszBuffer[0] = BORDER_CHARACTER;
 		pszBuffer[CMD_LINE_LINES - 1] = BORDER_CHARACTER;
 		if (nAlignment == PR_CENTER)
 			nNoOfSpaces /= 2;
 		if (nAlignment != PR_LEFT)
-			CopyMem(pszBuffer + nNoOfSpaces + 2, pstrArray[nTempCnt], wcslen(pstrArray[nTempCnt]) * sizeof(CHAR16));
+			CopyMem(pszBuffer + nNoOfSpaces + 2, pStrArray[nTempCnt], wcslen(pStrArray[nTempCnt]) * sizeof(CHAR16));
 		else
-			CopyMem(pszBuffer + 2, pstrArray[nTempCnt], wcslen(pstrArray[nTempCnt]) * sizeof(CHAR16));
-		Print(pszBuffer);
+			CopyMem(pszBuffer + 2, pStrArray[nTempCnt], wcslen(pStrArray[nTempCnt]) * sizeof(CHAR16));
+		nReturn = Print(pszBuffer);
 	}
 	PrintHBorder(CMD_LINE_LINES);
-	FreePool(pstrArray);
+	FreePool(pStrArray);
 	return nReturn;
 }
