@@ -1,12 +1,15 @@
-/*===================================================
-	UEFI Environment
-	Print services for additional addons to Print()
-	1.0
-===================================================*/
+/*
+** ===========================================================================
+** File: AdditionalPrintSvcs.c
+** Description: UEFI print addons (center print, border print etc.)
+** ===========================================================================
+*/
 
-//
-// Basic UEFI Libraries
-//
+/*
+**----------------------------------------------------------------------------
+**  Includes
+**----------------------------------------------------------------------------
+*/
 #include <Uefi.h>
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
@@ -14,134 +17,244 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/PrintLib.h>
 #include <Library/Dxe/Print/Print.h>
-//
-// Defines
-//
-#define CMD_LINE_LINES 80
-/***
-  DivApproxNext()
+#include "AdditionalPrintSvcs.h"
 
-  Alternate for ceil().
-  Return rounded division toward -inf to integral value when diving 2 numbers.
-***/
-INTN
-DivApproxNext(
-	INTN a,
-	INTN b
-)
-{
-	return (a / b) + ((a % b) != 0);
-}
+/*
+**----------------------------------------------------------------------------
+**  Definitions
+**----------------------------------------------------------------------------
+*/
 
-/***
-  UnicodeStrSect()
+/*
+**----------------------------------------------------------------------------
+**  Type Definitions
+**----------------------------------------------------------------------------
+*/
 
-  Alternate for strndup().
-  Returns a pointer to a copy of input with at most n characters
-  The result is always NUL terminated.
-***/
+/*
+**---------------------------------------------------------------------------
+**  Global variables
+**---------------------------------------------------------------------------
+*/
+
+/*
+**---------------------------------------------------------------------------
+**  Internal variables
+**---------------------------------------------------------------------------
+*/
+
+/*
+**---------------------------------------------------------------------------
+**  Function(internal use only) Declarations
+**---------------------------------------------------------------------------
+*/
+
+/*
+** ===========================================================================
+** Function: UnicodeStrSect()
+** Description: Writes n characters of input buffer to output buffer
+** Input: 
+**		pszInChar: input buffer
+**		nChars: characters to write to output
+** Output: function itself
+** Return value: NULL -> Failure, buffer -> Success
+** ===========================================================================
+*/
 CHAR16 
 *UnicodeStrSect(
-	IN CONST CHAR16 *inChar,
-	IN INT32 noOfChars
+	IN CONST CHAR16 *pszInChar,
+	IN INT32 nChars
 )
 {
-	CHAR16 *buffer;
-	buffer = AllocatePool((noOfChars + 1) * sizeof(CHAR16));
-	if (buffer == NULL)
+	CHAR16 *pszBuffer = AllocatePool((nChars + 1) * sizeof(CHAR16));
+	if (pszBuffer == NULL)
 		return NULL;
-	buffer[noOfChars] = 0;
-	return (CHAR16*)CopyMem(buffer, inChar, noOfChars * sizeof(CHAR16));
+	pszBuffer[nChars] = 0;
+	return (CHAR16*)CopyMem(pszBuffer, pszInChar, nChars * sizeof(CHAR16));
 }
 
-/***
-  UnicodeSplit()
+/*
+** ===========================================================================
+** Function: UnicodeSplit()
+** Description: Splits a string to n strings, using a string length variable
+** Input:
+**		pszInChar: input buffer
+**		nChars: characters to write to output
+**		nStrCnt: string count
+**		poutArray: out array (it will return itself after function's done)
+** Output: poutArray
+** Return value: NULL -> Failure, poutArray -> Success
+** ===========================================================================
+*/
 
-  Splits a string to n strings, using a string length variable.
-***/
 CHAR16**
 UnicodeSplit(
-	IN CONST CHAR16 *inChar,
-	IN INTN noOfChars,
-	OUT INTN *cntStrs,
-	CHAR16 **outArray
+	IN CONST CHAR16 *pszInChar,
+	IN INTN nChars,
+	OUT INTN *nStrCnt,
+	CHAR16 **poutArray
 )
 {
-	INTN strLen = wcslen(inChar);
-	INTN sectCnt = DivApproxNext(wcslen(inChar), noOfChars);
-	INTN t = 0;
-	INTN myCnt = 0;
-	*cntStrs = sectCnt;
-	outArray = AllocateZeroPool((sectCnt) * sizeof(CHAR16*));
-	if (outArray == NULL)
+	INTN nStrLen = wcslen(pszInChar);
+	INTN nSections = DivApproxNext(wcslen(pszInChar), nChars);
+	INTN nCurrSect = 0;
+	INTN nTempCnt = 0;
+	*nStrCnt = nSections;
+	poutArray = AllocateZeroPool((nSections) * sizeof(CHAR16*));
+	if (poutArray == NULL)
 		return NULL;
-	for (myCnt = 0, t = 0; strLen > 0; t++ )
+	for (nTempCnt = 0, nCurrSect = 0; nStrLen > 0; nCurrSect++)
 	{
-		if (strLen > sectCnt)
-			myCnt = noOfChars;
+		if (nStrLen > nSections)
+			nTempCnt = nChars;
 		else
-			myCnt = strLen;
-		outArray[t] = UnicodeStrSect(inChar + (noOfChars * t), myCnt);
-		if (strLen > sectCnt)
-			strLen-= noOfChars;
+			nTempCnt = nStrLen;
+		poutArray[nCurrSect] = UnicodeStrSect(pszInChar + (nChars * nCurrSect), nTempCnt);
+		if (nStrLen > nSections)
+			nStrLen -= nChars;
 		else
-			strLen = 0;
+			nStrLen = 0;
 	}
-	return outArray;
+	return poutArray;
 }
 
-/***
-  PrintCenter()
+/*
+** ===========================================================================
+** Function: PrintHBorder()
+** Description: Prints a horizontal border
+** Input:
+**		nCnt: border size
+** Output: Printed buffer
+** Return value: Other -> Failure, 0 -> Success
+** ===========================================================================
+*/
+EFI_STATUS
+PrintHBorder(
+	IN INTN nCnt
+)
+{
+	CHAR16 *pBuffer = AllocatePool((nCnt + 1) * sizeof(CHAR16));
+	if (pBuffer == NULL)
+		return EFI_OUT_OF_RESOURCES;
+	pBuffer[nCnt] = 0;
+	SetMem16(pBuffer, nCnt * 2, (CHAR16)BORDER_CHARACTER);
+	return Print(pBuffer);
+}
 
-  Prints a string in a centered position.
+/*
+**---------------------------------------------------------------------------
+**  Function(external use only) Declarations
+**---------------------------------------------------------------------------
+*/
 
-  Example of usage:
-  PrintCenter(L"Hi! I'm a centered string and it is printed centered thanks to my PrintCenter() function!\n");
-  Returns:
-  'Hi! I'm a centered string and it is printed centered thanks to my PrintCenter()'
-  '                                   function!                                   '
-
-  @retval  0         The application exited normally.
-  @retval  Other     An error occurred.
-***/
-UINTN
-PrintCenter(
-	IN CHAR16 *inChar,
+/*
+** ===========================================================================
+** Function: PrintAlign()
+** Description: Prints a string in whatever orientation the user wants
+** Input:
+**		pszInChar: Input string
+**		nAlignment: Alignment value
+**		...: blablabla
+** Output: Printed buffer in aligned position
+** Return value: Other -> Failure, 0 -> Success
+** ===========================================================================
+*/
+EFI_STATUS
+PrintAlign(
+	IN CHAR16 *pszInChar,
+	IN INTN nAlignment OPTIONAL,
 	...
 )
 {
-	UINTN   Return;
-	VA_LIST Marker;
-	CHAR16  Buffer[CMD_LINE_LINES + 1];
-	INT32	centerHalfWidth;
-	CHAR16  inTmp[EFI_DRIVER_LIB_MAX_PRINT_BUFFER];
-	CHAR16** strArray = NULL;
-	INTN	cntStrs = 0;
-	INT32	t;
-	Buffer[CMD_LINE_LINES] = 0;
+	UINTN   nReturn;
+	VA_LIST vMarker;
+	CHAR16  pszBuffer[CMD_LINE_LINES + 1];
+	INT32	nNoOfSpaces;
+	CHAR16  pszInTmp[EFI_DRIVER_LIB_MAX_PRINT_BUFFER];
+	CHAR16** pstrArray = NULL;
+	INTN	nStrCnt = 0;
+	INT32	nTempCnt;
+	pszBuffer[CMD_LINE_LINES] = 0;
 	//If there is a newline, remove it from input buffer.
-	if (inChar[wcslen(inChar) - 1] == '\n')
-		inChar[wcslen(inChar) - 1] = 0;
-	VA_START(Marker, inChar);
-	Return = UnicodeVSPrint(inTmp, sizeof(inTmp), inChar, Marker);
-	VA_END(Marker);
-	strArray = UnicodeSplit(inTmp, CMD_LINE_LINES, &cntStrs, strArray);
-	for (t = 0; t < cntStrs; t++)
+	if (pszInChar[wcslen(pszInChar) - 1] == '\n')
+		pszInChar[wcslen(pszInChar) - 1] = 0;
+	VA_START(vMarker, nAlignment);
+	nReturn = UnicodeVSPrint(pszInTmp, sizeof(pszInTmp), pszInChar, vMarker);
+	VA_END(vMarker);
+	pstrArray = UnicodeSplit(pszInTmp, CMD_LINE_LINES, &nStrCnt, pstrArray);
+	for (nTempCnt = 0; nTempCnt < nStrCnt; nTempCnt++)
 	{
 		// There is no solution for printing indentation with SPrint, so we SetMem with
 		// spaces our temp buffer and write our string!
-		SetMem16(Buffer, CMD_LINE_LINES*2, (CHAR16)' ');
-		centerHalfWidth = (INT32)(CMD_LINE_LINES - wcslen(strArray[t])) / 2;
-		CopyMem(Buffer + centerHalfWidth, strArray[t], wcslen(strArray[t]) * sizeof(CHAR16));
-		Print(Buffer);
+		SetMem16(pszBuffer, CMD_LINE_LINES * 2, (CHAR16)' ');
+		nNoOfSpaces = (INT32)(CMD_LINE_LINES - wcslen(pstrArray[nTempCnt]));
+		if (nAlignment == PR_CENTER)
+			nNoOfSpaces /= 2;
+		if (nAlignment != PR_LEFT)
+			CopyMem(pszBuffer + nNoOfSpaces, pstrArray[nTempCnt], wcslen(pstrArray[nTempCnt]) * sizeof(CHAR16));
+		else
+			CopyMem(pszBuffer, pstrArray[nTempCnt], wcslen(pstrArray[nTempCnt]) * sizeof(CHAR16));
+		Print(pszBuffer);
 	}
-	//Print(Buffer);
-	/*Causes a crash, so comment it
-	while (t > 0)
+	FreePool(pstrArray);
+	return nReturn;
+}
+
+
+/*
+** ===========================================================================
+** Function: PrintBorder()
+** Description: Prints a string in a border and in whatever orientation the
+** user wants
+** Input:
+**		pszInChar: Input string
+**		nAlignment: Alignment value
+**		...: blablabla
+** Output: Printed buffer in a border and aligned position
+** Return value: Other -> Failure, 0 -> Success
+** ===========================================================================
+*/
+EFI_STATUS
+PrintBorder(
+	IN CHAR16 *pszInChar,
+	IN INTN nAlignment OPTIONAL,
+	...
+)
+{
+	UINTN   nReturn;
+	VA_LIST vMarker;
+	CHAR16  pszBuffer[CMD_LINE_LINES + 1];
+	INT32	nNoOfSpaces;
+	CHAR16  szInTmp[EFI_DRIVER_LIB_MAX_PRINT_BUFFER];
+	CHAR16** pstrArray = NULL;
+	INTN	nStrCnt = 0;
+	INT32	nTempCnt;
+	pszBuffer[CMD_LINE_LINES] = 0;
+	//If there is a newline, remove it from input buffer.
+	if (pszInChar[wcslen(pszInChar) - 1] == '\n')
+		pszInChar[wcslen(pszInChar) - 1] = 0;
+	VA_START(vMarker, nAlignment);
+	nReturn = UnicodeVSPrint(szInTmp, sizeof(szInTmp), pszInChar, vMarker);
+	VA_END(vMarker);
+	pstrArray = UnicodeSplit(szInTmp, CMD_LINE_LINES - 4, &nStrCnt, pstrArray);
+	PrintHBorder(CMD_LINE_LINES);
+	for (nTempCnt = 0; nTempCnt < nStrCnt; nTempCnt++)
 	{
-		FreePool(strArray[t--]);
+		// There is no solution for printing indentation with SPrint, so we SetMem with
+		// spaces our temp buffer and write our string!
+		SetMem16(pszBuffer, CMD_LINE_LINES * 2, (CHAR16)' ');
+		nNoOfSpaces = (INT32)(CMD_LINE_LINES - 4 - wcslen(pstrArray[nTempCnt]));
+		pszBuffer[0] = BORDER_CHARACTER;
+		pszBuffer[CMD_LINE_LINES - 1] = BORDER_CHARACTER;
+		if (nAlignment == PR_CENTER)
+			nNoOfSpaces /= 2;
+		if (nAlignment != PR_LEFT)
+			CopyMem(pszBuffer + nNoOfSpaces + 2, pstrArray[nTempCnt], wcslen(pstrArray[nTempCnt]) * sizeof(CHAR16));
+		else
+			CopyMem(pszBuffer + 2, pstrArray[nTempCnt], wcslen(pstrArray[nTempCnt]) * sizeof(CHAR16));
+		Print(pszBuffer);
 	}
-	*/
-	FreePool(strArray);
-	return Return;
+	PrintHBorder(CMD_LINE_LINES);
+	FreePool(pstrArray);
+	return nReturn;
 }
