@@ -8,7 +8,6 @@
 #ifndef _ADDITIONALPRINTSVCS_H_
 #define _ADDITIONALPRINTSVCS_H_
 
-
 /*
 **----------------------------------------------------------------------------
 **  Includes
