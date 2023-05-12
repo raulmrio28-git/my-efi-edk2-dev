@@ -18,6 +18,7 @@
 #include <Library/PrintLib.h>
 #include <Library/Dxe/Print/Print.h>
 #include "AdditionalPrintSvcs.h"
+#include "UefiDebug.h"
 
 /*
 **----------------------------------------------------------------------------
@@ -53,22 +54,21 @@
 ** ===========================================================================
 ** Function: UnicodeStrSect()
 ** Description: Writes n characters of input buffer to output buffer
-** Input: 
+** Input:
 **		pszInChar: input buffer
 **		nChars: characters to write to output
 ** Output: function itself
-** Return value: NULL -> Failure, buffer -> Success
+** Return value: NULL -> Failure, pszBuffer -> Success
 ** ===========================================================================
 */
-CHAR16 
+CHAR16
 *UnicodeStrSect(
 	IN CONST CHAR16 *pszInChar,
 	IN INT32 nChars
 )
 {
-	CHAR16 *pszBuffer = AllocatePool((nChars + 1) * sizeof(CHAR16));
-	if (pszBuffer == NULL)
-		return NULL;
+	CHAR16 *pszBuffer;
+	ASSERT_CHECK((pszBuffer = AllocatePool((nChars + 1) * sizeof(CHAR16)))!=NULL);
 	pszBuffer[nChars] = 0;
 	return (CHAR16*)CopyMem(pszBuffer, pszInChar, nChars * sizeof(CHAR16));
 }
@@ -100,9 +100,7 @@ CHAR16
 	INTN nCurrSect = 0;
 	INTN nTempCnt = 0;
 	*nStrCnt = nSections;
-	poutArray = AllocateZeroPool((nSections) * sizeof(CHAR16*));
-	if (poutArray == NULL)
-		return NULL;
+	ASSERT_CHECK((poutArray = AllocateZeroPool((nSections) * sizeof(CHAR16*))) != NULL);
 	for (nTempCnt = 0, nCurrSect = 0; nStrLen > 0; nCurrSect++)
 	{
 		if (nStrLen > nSections)
@@ -133,9 +131,8 @@ PrintHBorder(
 	IN INTN nCnt
 )
 {
-	CHAR16 *pBuffer = AllocatePool((nCnt + 1) * sizeof(CHAR16));
-	if (pBuffer == NULL)
-		return EFI_OUT_OF_RESOURCES;
+	CHAR16 *pBuffer;
+	ASSERT_CHECK((pBuffer = AllocatePool((nCnt + 1) * sizeof(CHAR16))) != NULL);
 	pBuffer[nCnt] = 0;
 	SetMem16(pBuffer, nCnt * 2, (CHAR16)BORDER_CHARACTER);
 	return Print(pBuffer);
@@ -169,11 +166,11 @@ PrintAlign(
 	UINTN   nReturn;
 	VA_LIST vMarker;
 	CHAR16  pszBuffer[CMD_LINE_LINES + 1];
-	INT32	nNoOfSpaces;
+	INTN	nNoOfSpaces;
 	CHAR16  pszInTmp[EFI_DRIVER_LIB_MAX_PRINT_BUFFER];
 	CHAR16** pStrArray = NULL;
 	INTN	nStrCnt = 0;
-	INT32	nTempCnt;
+	INTN	nTempCnt;
 	pszBuffer[CMD_LINE_LINES] = 0;
 	//If there is a newline, remove it from input buffer.
 	if (pszInChar[wcslen(pszInChar) - 1] == '\n')
@@ -181,13 +178,13 @@ PrintAlign(
 	VA_START(vMarker, nAlignment);
 	nReturn = UnicodeVSPrint(pszInTmp, sizeof(pszInTmp), pszInChar, vMarker);
 	VA_END(vMarker);
-	pStrArray = UnicodeSplit(pszInTmp, CMD_LINE_LINES, &nStrCnt, pStrArray);
+	ASSERT_CHECK((pStrArray = UnicodeSplit(pszInTmp, CMD_LINE_LINES, &nStrCnt, pStrArray)) != NULL);
 	for (nTempCnt = 0; nTempCnt < nStrCnt; nTempCnt++)
 	{
 		// There is no solution for printing indentation with SPrint, so we SetMem with
 		// spaces our temp buffer and write our string!
 		SetMem16(pszBuffer, CMD_LINE_LINES * 2, (CHAR16)' ');
-		nNoOfSpaces = (INT32)(CMD_LINE_LINES - wcslen(pStrArray[nTempCnt]));
+		nNoOfSpaces = CMD_LINE_LINES - wcslen(pStrArray[nTempCnt]);
 		if (nAlignment == PR_CENTER)
 			nNoOfSpaces /= 2;
 		if (nAlignment != PR_LEFT)
@@ -224,11 +221,11 @@ PrintBorder(
 	UINTN   nReturn;
 	VA_LIST vMarker;
 	CHAR16  pszBuffer[CMD_LINE_LINES + 1];
-	INT32	nNoOfSpaces;
+	INTN	nNoOfSpaces;
 	CHAR16  szInTmp[EFI_DRIVER_LIB_MAX_PRINT_BUFFER];
 	CHAR16** pStrArray = NULL;
 	INTN	nStrCnt = 0;
-	INT32	nTempCnt;
+	INTN	nTempCnt;
 	pszBuffer[CMD_LINE_LINES] = 0;
 	//If there is a newline, remove it from input buffer.
 	if (pszInChar[wcslen(pszInChar) - 1] == '\n')
@@ -236,7 +233,7 @@ PrintBorder(
 	VA_START(vMarker, nAlignment);
 	nReturn = UnicodeVSPrint(szInTmp, sizeof(szInTmp), pszInChar, vMarker);
 	VA_END(vMarker);
-	pStrArray = UnicodeSplit(szInTmp, CMD_LINE_LINES - 4, &nStrCnt, pStrArray);
+	ASSERT_CHECK((pStrArray = UnicodeSplit(szInTmp, CMD_LINE_LINES - 4, &nStrCnt, pStrArray)) != NULL);
 	PrintHBorder(CMD_LINE_LINES);
 	for (nTempCnt = 0; nTempCnt < nStrCnt; nTempCnt++)
 	{
