@@ -35,9 +35,7 @@ enum
 	ASSERTION_NOT_IMPLEMENTED_YET //Not worked on!
 };
 #define DBGMSG_MAX_CHARS 256
-#ifndef EXIT_FAILURE
-#define EXIT_FAILURE -1
-#endif
+
 /*
 **---------------------------------------------------------------------------
 **  Variable Declarations
@@ -84,16 +82,16 @@ DebugPrtPrint(
 
 #define ASSERT_ASSERT(expr)    \
 	ASSERT_DEBUG(ASSERTION_ASSERT, expr);\
-	if (!(expr)) { return EXIT_FAILURE; }
+	if (!(expr)) { return EFI_LOAD_ERROR; }
 #define ASSERT_REQUIRE(expr)    \
 	ASSERT_DEBUG(ASSERTION_REQUIRE, expr);\
-	if (!(expr)) { return EXIT_FAILURE; }
+	if (!(expr)) { return EFI_LOAD_ERROR; }
 #define ASSERT_ENSURE(expr)    \
 	ASSERT_DEBUG(ASSERTION_ENSURE, expr);\
-	if (!(expr)) { return EXIT_FAILURE; }
+	if (!(expr)) { return EFI_LOAD_ERROR; }
 #define ASSERT_CHECK(expr)        \
 	ASSERT_DEBUG(ASSERTION_CHECK, expr);\
-	if (!(expr)) { return EXIT_FAILURE; }
+	if (!(expr)) { return EFI_LOAD_ERROR; }
 #define ASSERT_NEVER_GET_HERE()    ASSERT_DEBUG(ASSERTION_NEVER_GET_HERE, NULL);
 #define ASSERT_NOT_IMPLEMENTED_YET()    ASSERT_DEBUG(ASSERTION_NOT_IMPLEMENTED_YET, NULL);
 
