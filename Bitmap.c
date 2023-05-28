@@ -306,6 +306,8 @@ ConvertBmpToGopBlt(
 			pImage = pImage + (4 - (nImageIndex % 4));
 		}
 	}
+	if (nColorMapNum != 0)
+		FreePool(ptBmpColorMap);
 	return EFI_SUCCESS;
 };
 
