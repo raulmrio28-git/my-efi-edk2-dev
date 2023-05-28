@@ -27,6 +27,19 @@ extern "C" {
 **----------------------------------------------------------------------------
 */
 
+enum
+{
+	FRONT_STYLE_LEFT_TOP,
+	FRONT_STYLE_LEFT_CENTER,
+	FRONT_STYLE_LEFT_BOTTOM,
+	FRONT_STYLE_MIDDLE_TOP,
+	FRONT_STYLE_MIDDLE_CENTER,
+	FRONT_STYLE_MIDDLE_BOTTOM,
+	FRONT_STYLE_RIGHT_TOP,
+	FRONT_STYLE_RIGHT_CENTER,
+	FRONT_STYLE_RIGHT_BOTTOM
+};
+
 /*
 **---------------------------------------------------------------------------
 **  Variable Declarations
@@ -47,7 +60,7 @@ extern "C" {
 **		ptGraphicsOutput: Output protocol
 **		ptBlt: BLT pixel buffer
 **		nMode: BLT opmode
-**		ptRect: regtangle with info about position
+**		ptRect: Rectangle with info about position
 ** Output: BLT data output on the screen
 ** Return value: FALSE -> Failure, TRUE -> Success
 ** ===========================================================================

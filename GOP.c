@@ -59,7 +59,7 @@
 **		ptGraphicsOutput: Output protocol
 **		ptBlt: BLT pixel buffer
 **		nMode: BLT opmode
-**		ptRect: regtangle with info about position
+**		ptRect: Rectangle with info about position
 ** Output: BLT data output on the screen
 ** Return value: FALSE -> Failure, TRUE -> Success
 ** ===========================================================================

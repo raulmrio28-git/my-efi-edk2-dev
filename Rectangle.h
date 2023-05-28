@@ -53,8 +53,8 @@ typedef struct {
 ** Description: Sets rectangle buffer data with specific values
 ** Input:
 **		ptRect: Rectangle to be set
-**		nLeft, nTop, nRight, nBottom = values to fill the rectangle with
-** Output: filled rectangle
+**		nLeft, nTop, nRight, nBottom = Values to fill the rectangle with
+** Output: Filled rectangle
 ** Return value: FALSE -> Failure, TRUE -> Success
 ** ===========================================================================
 */
@@ -75,7 +75,7 @@ SetRect(
 ** Input:
 **		ptDestRect: Rectangle copy destination
 **		ptSrcRect: Rectangle copy source
-** Output: copied rectangle
+** Output: Copied rectangle
 ** Return value: FALSE -> Failure, TRUE -> Success
 ** ===========================================================================
 */
@@ -92,8 +92,8 @@ CopyRect(
 ** Description: Shrinks rectangle buffer data with specific values
 ** Input:
 **		ptRect: Rectangle to modify
-**		nDiffX, nDiffY = values to shrink the rectangle with
-** Output: shrunk rectangle
+**		nDiffX, nDiffY = Values to shrink the rectangle with
+** Output: Shrunk rectangle
 ** Return value: FALSE -> Failure, TRUE -> Success
 ** ===========================================================================
 */
@@ -111,8 +111,8 @@ ShrinkRect(
 ** Description: Offsets rectangle buffer data with specific values
 ** Input:
 **		ptRect: Rectangle to modify
-**		nDiffX, nDiffY = values to offset the rectangle with
-** Output: offset rectangle
+**		nDiffX, nDiffY = Values to offset the rectangle with
+** Output: Offset rectangle
 ** Return value: FALSE -> Failure, TRUE -> Success
 ** ===========================================================================
 */

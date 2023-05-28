@@ -53,12 +53,16 @@
 /*
 ** ===========================================================================
 ** Function: DebugPrtPrint()
-** Description: Writes n characters of input buffer to output buffer
+** Description: Writes assert info to COM port
 ** Input:
-**		pszInChar: input buffer
-**		nChars: characters to write to output
-** Output: function itself
-** Return value: NULL -> Failure, buffer -> Success
+**		nAssertLevel: Assert level
+**		pszAssertType: nAssertLevel as ASCII string
+**		pszFunction: Function as ASCII string
+**		pszExpression: Expression as ASCII string
+**		pszFile: Source file name
+**		nLine: Source line
+** Output: Assert info to COM port
+** Return value: ASSERTION_NEVER_GET_HERE -> Failure, assert level -> Success
 ** ===========================================================================
 */
 EFI_STATUS
@@ -79,7 +83,7 @@ DebugPrtPrint(
 	if (nAssertLevel == ASSERTION_NOT_IMPLEMENTED_YET)
 		AsciiSPrint(pszBuffer, sizeof(pszBuffer), "%a:%a->Function not implemented! (file %a, line %d)\n", pszAssertType, pszFunction, pszFile, nLine);
 	else
-		AsciiSPrint(pszBuffer, sizeof(pszBuffer), "%a:%a->%a (file %a, line %d)\n", pszAssertType, pszFunction, pszExpression, pszFile, nLine);
+		AsciiSPrint(pszBuffer, sizeof(pszBuffer), "%a:%a->%a failed! (file %a, line %d)\n", pszAssertType, pszFunction, pszExpression, pszFile, nLine);
 	SerialPortWrite((UINT8 *)pszBuffer, AsciiStrLen(pszBuffer));
 	return nAssertLevel;
 }
@@ -87,13 +91,18 @@ DebugPrtPrint(
 /*
 ** ===========================================================================
 ** Function: DebugPrtPrintMsg()
-** Description: Writes n characters of input buffer to output buffer, whist u-
-** sing a custom message shown for debugging...
+** Description: Writes assert info to COM port with custom message
 ** Input:
-**		pszInChar: input buffer
-**		nChars: characters to write to output
-** Output: function itself
-** Return value: NULL -> Failure, buffer -> Success
+**		nAssertLevel: Assert level
+**		pszAssertType: nAssertLevel as ASCII string
+**		pszFunction: Function as ASCII string
+**		pszExpression: Expression as ASCII string
+**		pszFile: Source file name
+**		nLine: Source line
+**		pszMessage: String to be printed
+**		etc.
+** Output: Assert info to COM port
+** Return value: ASSERTION_NEVER_GET_HERE -> Failure, assert level -> Success
 ** ===========================================================================
 */
 EFI_STATUS
@@ -129,12 +138,17 @@ DebugPrtPrintMsg(
 /*
 ** ===========================================================================
 ** Function: DebugPrtPrintMsgOnly()
-** Description: Same as above but no expression string
+** Description: Writes assert message info to COM port expression-less
 ** Input:
-**		pszInChar: input buffer
-**		nChars: characters to write to output
-** Output: function itself
-** Return value: NULL -> Failure, buffer -> Success
+**		nAssertLevel: Assert level
+**		pszAssertType: nAssertLevel as ASCII string
+**		pszFunction: Function as ASCII string
+**		pszFile: Source file name
+**		nLine: Source line
+**		pszMessage: String to be printed
+**		etc.
+** Output: Assert info to COM port
+** Return value: ASSERTION_NEVER_GET_HERE -> Failure, assert level -> Success
 ** ===========================================================================
 */
 EFI_STATUS
