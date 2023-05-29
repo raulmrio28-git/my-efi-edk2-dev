@@ -335,6 +335,7 @@ DrawBmpImage(
 	UINTN			nGopBltSize;
 	BMP_PROCESS_HEADER tBmpProcess;
 	EFI_GRAPHICS_OUTPUT_BLT_PIXEL* ptGopBlt;
+	ASSERT_ENSURE(ptGraphicsOutput != NULL || pBitmap != NULL || nBitmapSize != 0 || ptRect != NULL);
 	ASSERT_CHECK_EFISTATUS(ReadBmpHdr(pBitmap, nBitmapSize, &tBmpProcess));
 	ASSERT_DEBUG_MSGONLY("tBmpHeader->Width=%d, Height=%d, BPP=%d, Compression=%d, Size=%d, UpsideDown?=%a", tBmpProcess.tBmpHeader.nWidth, tBmpProcess.tBmpHeader.nHeight, tBmpProcess.tBmpHeader.nBPP, tBmpProcess.tBmpHeader.nCompression, tBmpProcess.tBmpHeader.nImgSize, (tBmpProcess.bIsUpsideDown == TRUE) ? "TRUE" : "FALSE");
 	ASSERT_CHECK_EFISTATUS(ConvertBmpToGopBlt(pBitmap, nBitmapSize, &ptGopBlt, &nGopBltSize, &tBmpProcess));
