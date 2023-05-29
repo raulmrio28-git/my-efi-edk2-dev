@@ -29,8 +29,7 @@
 */
 
 #define ASSERT_ENSURE_FALSE(expr)    \
-	ASSERT_DEBUG(ASSERTION_ENSURE, expr);\
-	if (!(expr)) { return FALSE; }
+	if (!(expr)) { ASSERT_DEBUG(ASSERTION_ENSURE, expr); return FALSE; }
 
 /*
 **----------------------------------------------------------------------------
