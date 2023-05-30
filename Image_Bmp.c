@@ -1,6 +1,6 @@
 /*
 ** ===========================================================================
-** File: Bitmap.c
+** File: Image_Bmp.c
 ** Description: UEFI graphics-related code module (bitmap (BMP) manipulation)
 ** ===========================================================================
 */
@@ -24,7 +24,7 @@
 #include "Rectangle.h"
 #include "GOP.h"
 #include "UefiDebug.h"
-#include "Bitmap.h"
+#include "Image_Bmp.h"
 
 /*
 **----------------------------------------------------------------------------
@@ -163,8 +163,10 @@ ReadBmpHdr(
 ** Input:
 **		pImage: Image itself
 **		nImageSize: Image size
+**		ptGopBlt: GOP BLT buffer
+**		pnGopBltSize: output GOP BLT size
 **		ptBmpHeader: Bitmap info structure
-** Output: init-ed bitmap info structure
+** Output: converted bitmap to valid GOP BLT data
 ** Return value: EFI_LOAD_ERROR -> Failure, EFI_SUCCESS -> Success
 ** ===========================================================================
 */
@@ -173,7 +175,7 @@ ConvertBmpToGopBlt(
 	IN		UINT8*	pImage,
 	IN		UINTN	nImageSize,
 	IN OUT	VOID**	ptGopBlt,
-	IN OUT	UINTN*	nGopBltSize,
+	IN OUT	UINTN*	pnGopBltSize,
 	IN		BMP_PROCESS_HEADER*	ptBmpHeader
 )
 {
@@ -216,8 +218,8 @@ ConvertBmpToGopBlt(
 	ASSERT_CHECK((nBltBufferSize > DivU64x32((UINTN)~0, sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL))) == 0);
 	nBltBufferSize = MultU64x32(nBltBufferSize, sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
 	bIsAllocated = FALSE;
-	*nGopBltSize = (UINTN)nBltBufferSize;
-	*ptGopBlt = AllocatePool(*nGopBltSize);
+	*pnGopBltSize = (UINTN)nBltBufferSize;
+	*ptGopBlt = AllocatePool(*pnGopBltSize);
 	bIsAllocated = TRUE;
 	ASSERT_CHECK(*ptGopBlt != NULL);
 	ptBltBuffer = *ptGopBlt;
@@ -319,7 +321,7 @@ ConvertBmpToGopBlt(
 **		ptGraphicsOutput: GOP
 **		pBitmap: Image itself
 **		nBitmappSize: Image size
-**		ptBmpHeader: Bitmap info structure
+**		ptRect: Rectangle to modify
 ** Output: Bitmap image output on the screen
 ** Return value: EFI_LOAD_ERROR -> Failure, EFI_SUCCESS -> Success
 ** ===========================================================================

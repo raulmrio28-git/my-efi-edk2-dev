@@ -1,12 +1,12 @@
 /*
 ** ===========================================================================
-** File: Bitmap.h
+** File: Image_Bmp.h
 ** Description: UEFI graphics-related code module (bitmap (BMP) manipulation)
 ** ===========================================================================
 */
 
-#ifndef __DRAWLOGO_H__
-#define __DRAWLOGO_H__
+#ifndef _GRAPHICS_IMAGE_BMP_H_
+#define _GRAPHICS_IMAGE_BMP_H_
 
 /*
 **----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ typedef struct {
 **		ptGraphicsOutput: GOP
 **		pBitmap: Image itself
 **		nBitmappSize: Image size
-**		pBmpHeader: Bitmap info structure
+**		ptRect: Rectangle to modify
 ** Output: Bitmap image output on the screen
 ** Return value: EFI_LOAD_ERROR -> Failure, EFI_SUCCESS -> Success
 ** ===========================================================================
@@ -117,4 +117,4 @@ DrawBmpImage(
 }  /* extern "C" */
 #endif
 
-#endif
+#endif /* _GRAPHICS_IMAGE_BMP_H_ */
