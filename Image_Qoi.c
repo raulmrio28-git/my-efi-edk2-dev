@@ -97,8 +97,6 @@ ConvertQoiToGopBlt(
 )
 {
 	BOOLEAN		bIsAllocated;
-	UINT32		nWidth;
-	UINT32		nHeight;
 	UINT64	nBltBufferSize;
 	ASSERT_ENSURE(pImage != NULL || nImageSize != 0 || ptQoiDescription != NULL);
 	ASSERT_CHECK(*(unsigned int *)pImage == 'fioq');
