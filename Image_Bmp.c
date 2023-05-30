@@ -191,7 +191,7 @@ ConvertBmpToGopBlt(
 	UINTN	Height;
 	UINTN	nIndex;
 	UINTN	Width;
-	ASSERT_DEBUG_MSGONLY("tBmpHeader->Width=%d, Height=%d, BPP=%d, Compression=%d, Size=%d, UpsideDown?=%a", ptBmpHeader->tBmpHeader.nWidth, ptBmpHeader->tBmpHeader.nHeight, ptBmpHeader->tBmpHeader.nBPP, ptBmpHeader->tBmpHeader.nCompression, ptBmpHeader->tBmpHeader.nImgSize, (ptBmpHeader->bIsUpsideDown == TRUE) ? "TRUE" : "FALSE");
+	ASSERT_ENSURE(pImage != NULL || nImageSize != 0 || ptBmpHeader != NULL);
 	ASSERT_CHECK(sizeof(BMP_HEADER) < nImageSize);
 	nDataSizePerLine = ((ptBmpHeader->tBmpHeader.nWidth * ptBmpHeader->tBmpHeader.nBPP + 31) >> 3) & (~0x3);
 	nBltBufferSize = MultU64x32(nDataSizePerLine, ptBmpHeader->tBmpHeader.nHeight);
