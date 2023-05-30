@@ -24,14 +24,14 @@ extern "C" {
 **----------------------------------------------------------------------------
 */
 
-#pragma pack(1)
+#pragma pack(push,1)
 typedef struct {
 	UINTN                                        nLeft;
 	UINTN                                        nTop;
 	UINTN                                        nRight;
 	UINTN                                        nBottom;
 } RECT;
-#pragma pack()
+#pragma pack(pop)
 #define WidthRect(ptRect) (ptRect->nRight - ptRect->nLeft + 1)
 #define HeightRect(ptRect) (ptRect->nBottom - ptRect->nTop + 1)
 
