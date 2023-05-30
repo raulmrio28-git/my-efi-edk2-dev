@@ -50,7 +50,7 @@ enum
 	BITMAP_BPP_24BPP888,
 	BITMAP_BPP_32BPP8888
 };
-#pragma pack(push,1)
+#pragma pack(1)
 typedef struct {
 	UINT16				wType;
 	UINT32				nSize;
@@ -69,22 +69,22 @@ typedef struct {
 	UINT32				nUsedColors;
 	UINT32				nImpColors;
 } BMP_HEADER;
-#pragma pack(pop)
-#pragma pack(push,1)
+#pragma pack()
+#pragma pack(1)
 typedef struct {
 	UINT32				nBlueBits;
 	UINT32				nGreenBits;
 	UINT32				nRedBits;
 	UINT32				nTranspBits;
 } BMP_PIXEL_BITS;
-#pragma pack(pop)
-#pragma pack(push,1)
+#pragma pack()
+#pragma pack(1)
 typedef struct {
 	BMP_HEADER			tBmpHeader;
 	UINT32				nBitPerPixel;
 	BOOLEAN				bIsUpsideDown;
 } BMP_PROCESS_HEADER;
-#pragma pack(pop)
+#pragma pack()
 
 /*
 **---------------------------------------------------------------------------
