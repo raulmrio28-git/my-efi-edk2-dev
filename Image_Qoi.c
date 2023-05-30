@@ -100,14 +100,11 @@ ConvertQoiToGopBlt(
 	UINT32		nWidth;
 	UINT32		nHeight;
 	UINT64	nBltBufferSize;
-	ASSERT_ENSURE(pImage != NULL || nImageSize != 0);
-	CopyMem(ptQoiDescription, pImage+4, sizeof(qoi_desc));
+	ASSERT_ENSURE(pImage != NULL || nImageSize != 0 || ptQoiDescription != NULL);
 	ASSERT_CHECK(*(unsigned int *)pImage == 'fioq');
 	bIsAllocated = FALSE;
-	ASSERT_CHECK((*ptGopBlt = qoi_decode(pImage, nImageSize, ptQoiDescription, 3)) != NULL);
+	ASSERT_CHECK((*ptGopBlt = qoi_decode(pImage, nImageSize, ptQoiDescription, 4)) != NULL);
 	bIsAllocated = TRUE;
-	ptQoiDescription->width = SwapBytes32(ptQoiDescription->width);
-	ptQoiDescription->height = SwapBytes32(ptQoiDescription->height);
 	nBltBufferSize = MultU64x32((UINT64)ptQoiDescription->width, ptQoiDescription->height);
 	ASSERT_CHECK((nBltBufferSize > DivU64x32((UINTN)~0, sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL))) == 0);
 	nBltBufferSize = MultU64x32(nBltBufferSize, sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
