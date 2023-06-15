@@ -71,6 +71,7 @@ DrawBlt_ImageFade(
 ** Input:
 **		ptGraphicsOutput: Output protocol
 **		ptBlt: BLT pixel buffer
+**		bIsCounterClockwise: TRUE = counter-clockwise order
 **		ptRect: Rectangle with info about position
 ** Output: BLT data output on the screen with respecive effect
 ** Return value: EFI_LOAD_ERROR -> Failure, EFI_SUCCESS -> Success
@@ -81,6 +82,7 @@ EFIAPI
 DrawBlt_ImageClockWipe(
 	IN EFI_GRAPHICS_OUTPUT_PROTOCOL *ptGraphicsOutput,
 	IN CONST	EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
+	IN BOOLEAN	bIsCounterClockwise,
 	IN CONST RECT*  ptRect
 );
 

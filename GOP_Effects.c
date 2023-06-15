@@ -221,6 +221,7 @@ DrawBlt_ImageFade(
 ** Input:
 **		ptGraphicsOutput: Output protocol
 **		ptBlt: BLT pixel buffer
+**		bIsCounterClockwise: TRUE = counter-clockwise order
 **		ptRect: Rectangle with info about position
 ** Output: BLT data output on the screen with respecive effect
 ** Return value: EFI_LOAD_ERROR -> Failure, EFI_SUCCESS -> Success
@@ -231,6 +232,7 @@ EFIAPI
 DrawBlt_ImageClockWipe(
 	IN EFI_GRAPHICS_OUTPUT_PROTOCOL *ptGraphicsOutput,
 	IN CONST	EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
+	IN BOOLEAN	bIsCounterClockwise,
 	IN CONST RECT*  ptRect
 )
 {
@@ -240,14 +242,32 @@ DrawBlt_ImageClockWipe(
 	Width = (UINT32)WidthRect(ptRect);
 	Height = (UINT32)HeightRect(ptRect);
 	INTN i;
-	for (i = (INTN)((Width - 1) >> 1); i > 0; i--)
-		GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft,  ptRect->nTop, Width, Height, i, 0, (Width - 1) >> 1, (Height - 1) >> 1);
-	for (i = 0; i < (INTN)(Height - 1); i++)
-		GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft,  ptRect->nTop, Width, Height, 0, i, (Width - 1) >> 1, (Height - 1) >> 1);
-	for (i = 0; i < (INTN)(Width - 1); i++)
-		GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft,  ptRect->nTop, Width, Height, i, Height - 1 - 1, (Width - 1) >> 1, (Height - 1) >> 1);
-	for (i = (INTN)(Height - 1 - 1); i > 0; i--)
-		GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft,  ptRect->nTop, Width, Height, Width - 1 - 1, i, (Width - 1) >> 1, (Height - 1) >> 1);
-	for (i = (INTN)(Width - 1 - 1); i > (INTN)((Width - 1) >> 1); i--)
-		GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft,  ptRect->nTop, Width, Height, i, 0, (Width - 1) >> 1, (Height - 1) >> 1);
+	if (bIsCounterClockwise == FALSE)
+	{
+		for (i = (INTN)((Width - 1) >> 1); i < (INTN)(Width - 1 - 1); i++)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, i, 0, (Width - 1) >> 1, (Height - 1) >> 1);
+		for (i = 0; i < (INTN)(Height - 1 - 1); i++)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, Width - 1 - 1, i, (Width - 1) >> 1, (Height - 1) >> 1);
+		for (i = (INTN)(Width - 1); i > 0; i--)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, i, Height - 1 - 1, (Width - 1) >> 1, (Height - 1) >> 1);
+		for (i = (INTN)(Height - 1); i > 0; i--)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, 0, i, (Width - 1) >> 1, (Height - 1) >> 1);
+		for (i = 0; i < (INTN)((Width - 1) >> 1); i++)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, i, 0, (Width - 1) >> 1, (Height - 1) >> 1);
+	}
+	else
+	{
+		for (i = (INTN)((Width - 1) >> 1); i > 0; i--)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, i, 0, (Width - 1) >> 1, (Height - 1) >> 1);
+		for (i = 0; i < (INTN)(Height - 1); i++)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, 0, i, (Width - 1) >> 1, (Height - 1) >> 1);
+		for (i = 0; i < (INTN)(Width - 1); i++)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, i, Height - 1 - 1, (Width - 1) >> 1, (Height - 1) >> 1);
+		for (i = (INTN)(Height - 1 - 1); i > 0; i--)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, Width - 1 - 1, i, (Width - 1) >> 1, (Height - 1) >> 1);
+		for (i = (INTN)(Width - 1 - 1); i > (INTN)((Width - 1) >> 1); i--)
+			GopEffects_BresenhamDrawLine(ptGraphicsOutput, ptBlt, ptRect->nLeft, ptRect->nTop, Width, Height, i, 0, (Width - 1) >> 1, (Height - 1) >> 1);
+
+	}
+		
 }
