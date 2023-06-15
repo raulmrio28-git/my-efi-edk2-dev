@@ -59,7 +59,7 @@ EFI_STATUS
 EFIAPI
 GopEffects_BresenhamDrawLine(
 	IN EFI_GRAPHICS_OUTPUT_PROTOCOL *ptGraphicsOutput,
-	IN CONST EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptGopBlt,
+	IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptGopBlt,
 	IN UINTN nX,
 	IN UINTN nY,
 	IN UINTN nWidth,
@@ -231,7 +231,7 @@ EFI_STATUS
 EFIAPI
 DrawBlt_ImageClockWipe(
 	IN EFI_GRAPHICS_OUTPUT_PROTOCOL *ptGraphicsOutput,
-	IN CONST	EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
+	IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
 	IN BOOLEAN	bIsCounterClockwise,
 	IN CONST RECT*  ptRect
 )
@@ -270,4 +270,58 @@ DrawBlt_ImageClockWipe(
 
 	}
 		
+}
+
+/*
+** ===========================================================================
+** Function: DrawBlt_ImageRainFallShow()
+** Description: Outputs graphical image to screen with a rainfall effect
+** Input:
+**		ptGraphicsOutput: Output protocol
+**		ptBlt: BLT pixel buffer
+**		bIsBottomToTop: TRUE = do the effect in reverse order
+**		ptRect: Rectangle with info about position
+** Output: BLT data output on the screen with respecive effect
+** Return value: EFI_LOAD_ERROR -> Failure, EFI_SUCCESS -> Success
+** ===========================================================================
+*/
+EFI_STATUS
+EFIAPI
+DrawBlt_ImageRainFallShow(
+	IN EFI_GRAPHICS_OUTPUT_PROTOCOL *ptGraphicsOutput,
+	IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
+	IN BOOLEAN bIsBottomToTop,
+	IN CONST RECT*	ptRect
+)
+{
+	UINT32 nCurrRow;
+	UINT32 nCurrRowToDrawTo;
+	UINT32 nWidth;
+	UINT32 nHeight;
+	ASSERT_ENSURE(ptGraphicsOutput != NULL || ptBlt != NULL || ptRect != NULL);
+	nWidth = WidthRect(ptRect);
+	nHeight =HeightRect(ptRect);
+	if (bIsBottomToTop == FALSE)
+	{
+		for (nCurrRow = 0; nCurrRow <= (nHeight - 1); nCurrRow++)
+		{
+			for (nCurrRowToDrawTo = (nHeight - 1); nCurrRowToDrawTo >= nCurrRow; nCurrRowToDrawTo--)
+			{
+				ASSERT_CHECK_EFISTATUS(ptGraphicsOutput->Blt(ptGraphicsOutput, &(ptBlt[nCurrRow*nWidth]), EfiBltBufferToVideo, 0, 0, ptRect->nLeft, ptRect->nTop + nCurrRowToDrawTo, nWidth, 1, 0));
+			}
+			gBS->Stall(2500); /* 2.5ms pause */
+		}
+	}
+	else
+	{
+		for (nCurrRow = (nHeight - 1); nCurrRow >= 0; nCurrRow--) 
+		{
+			for (nCurrRowToDrawTo = 0; nCurrRowToDrawTo <= nCurrRow; nCurrRowToDrawTo++)
+			{
+				ASSERT_CHECK_EFISTATUS(ptGraphicsOutput->Blt(ptGraphicsOutput, &(ptBlt[nCurrRow*nWidth]), EfiBltBufferToVideo, 0, 0, ptRect->nLeft, ptRect->nTop + nCurrRowToDrawTo, nWidth, 1, 0));
+			}
+			gBS->Stall(2500); /* 2.5ms pause */
+		}
+	}
+	return EFI_SUCCESS;
 }

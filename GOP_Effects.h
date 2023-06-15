@@ -81,9 +81,31 @@ EFI_STATUS
 EFIAPI
 DrawBlt_ImageClockWipe(
 	IN EFI_GRAPHICS_OUTPUT_PROTOCOL *ptGraphicsOutput,
-	IN CONST	EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
+	IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
 	IN BOOLEAN	bIsCounterClockwise,
 	IN CONST RECT*  ptRect
+);
+
+/*
+** ===========================================================================
+** Function: DrawBlt_ImageRainFallShow()
+** Description: Outputs graphical image to screen with a rainfall effect
+** Input:
+**		ptGraphicsOutput: Output protocol
+**		ptBlt: BLT pixel buffer
+**		bIsBottomToTop: TRUE = do the effect in reverse order
+**		ptRect: Rectangle with info about position
+** Output: BLT data output on the screen with respecive effect
+** Return value: EFI_LOAD_ERROR -> Failure, EFI_SUCCESS -> Success
+** ===========================================================================
+*/
+EFI_STATUS
+EFIAPI
+DrawBlt_ImageRainFallShow(
+	IN EFI_GRAPHICS_OUTPUT_PROTOCOL *ptGraphicsOutput,
+	IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
+	IN BOOLEAN bIsBottomToTop,
+	IN CONST RECT*	ptRect
 );
 
 #ifdef __cplusplus
