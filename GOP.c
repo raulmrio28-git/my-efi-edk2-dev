@@ -61,7 +61,7 @@
 **		nMode: BLT opmode
 **		ptRect: Rectangle with info about position
 ** Output: BLT data output on the screen
-** Return value: FALSE -> Failure, TRUE -> Success
+** Return value: EFI_LOAD_ERROR -> Failure, EFI_SUCCESS -> Success
 ** ===========================================================================
 */
 EFI_STATUS
@@ -69,10 +69,9 @@ DrawBlt(
 	IN EFI_GRAPHICS_OUTPUT_PROTOCOL *ptGraphicsOutput,
 	IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
 	IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION nMode,
-	IN RECT*  ptRect
+	IN CONST RECT*  ptRect
 )
 {
-	EFI_STATUS nStatus = EFI_SUCCESS;
 	UINTN      nX = ptRect->nLeft;
 	UINTN      nY = ptRect->nTop;
 	UINTN      nWidth = WidthRect(ptRect);
@@ -82,40 +81,18 @@ DrawBlt(
 	switch (nMode) {
 	case EfiBltVideoFill:
 	case EfiBltBufferToVideo:
-		nStatus = ptGraphicsOutput->Blt(
-			ptGraphicsOutput,
-			ptBlt,
-			nMode,
-			0,
-			0,
-			nX,
-			nY,
-			nWidth,
-			nHeight,
-			0);
+		ASSERT_DEBUG_MSGONLY("BLT->Video Out");
+		ASSERT_CHECK_EFISTATUS(ptGraphicsOutput->Blt(ptGraphicsOutput, ptBlt, nMode, 0, 0, nX, nY, nWidth, nHeight, 0));
 		break;
-
 	case EfiBltVideoToBltBuffer:
-		nStatus = ptGraphicsOutput->Blt(
-			ptGraphicsOutput,
-			ptBlt,
-			nMode,
-			nX,
-			nY,
-			0,
-			0,
-			nWidth,
-			nHeight,
-			0
-		);
+		ASSERT_DEBUG_MSGONLY("Video In->BLT");
+		ASSERT_CHECK_EFISTATUS(ptGraphicsOutput->Blt(ptGraphicsOutput, ptBlt, nMode, nX, nY, 0, 0, nWidth, nHeight, 0));
 		break;
-
 	default:
+		ASSERT_DEBUG_MSGONLY("Unknown mode!");
+		return EFI_LOAD_ERROR;
 		break;
-
 	}
 
-	ASSERT_DEBUG_MSGONLY("Err=%d, GOPMode=%d, BLTMode=%d, Pos-> X=%d, Y=%d; Size= %d\x78%d", nStatus, ptGraphicsOutput->Mode->Mode, nMode, nX, nY, nWidth, nHeight);
-
-	return nStatus;
+	return EFI_SUCCESS;
 }
