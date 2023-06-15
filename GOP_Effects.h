@@ -64,6 +64,26 @@ DrawBlt_ImageFade(
 	IN RECT*  ptRect
 );
 
+/*
+** ===========================================================================
+** Function: DrawBlt_ImageClockWipe()
+** Description: Outputs graphical image to screen with a clock wipe effect
+** Input:
+**		ptGraphicsOutput: Output protocol
+**		ptBlt: BLT pixel buffer
+**		ptRect: Rectangle with info about position
+** Output: BLT data output on the screen with respecive effect
+** Return value: EFI_LOAD_ERROR -> Failure, EFI_SUCCESS -> Success
+** ===========================================================================
+*/
+EFI_STATUS
+EFIAPI
+DrawBlt_ImageClockWipe(
+	IN EFI_GRAPHICS_OUTPUT_PROTOCOL *ptGraphicsOutput,
+	IN CONST	EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ptBlt,
+	IN CONST RECT*  ptRect
+);
+
 #ifdef __cplusplus
 }  /* extern "C" */
 #endif
